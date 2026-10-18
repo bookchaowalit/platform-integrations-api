@@ -35,6 +35,10 @@ from urllib.parse import parse_qs, urlsplit
 
 from service_auth import AuthError, AuthPolicy, check_read_auth, is_loopback, readiness
 
+from _sentry import capture, init_sentry
+
+init_sentry()
+
 SERVICE_NAME = "solo-empire-integrations-api"
 SCHEMA_VERSION = "solo-empire.integrations.v1"
 STATUSES = ("live", "mcp_only", "paused", "planned")
@@ -359,7 +363,8 @@ class IntegrationsApi:
                     }
                 },
             )
-        except Exception:  # noqa: BLE001 - last-resort 500 that never echoes internal error text
+        except Exception as exc:  # noqa: BLE001 - last-resort 500 that never echoes internal error text
+            capture(exc)  # no-op unless SENTRY_DSN is set
             return Response(
                 500,
                 {
