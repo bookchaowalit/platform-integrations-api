@@ -53,6 +53,11 @@ See the [Integrations API v1 contract](contracts/integrations.v1.md).
 ## Deploy
 
 This folder is an independent deploy unit described by [`service.yaml`](service.yaml).
+
+Deploys (CD, since 2026-10-18): the Railway service is connected to this repository's `main` with
+Railway's Wait for CI (`checkSuites`). A merge to `main` deploys only after the CI and security
+checks pass; a failing check leaves production on the previous deployment. Roll back by
+redeploying an earlier deployment in Railway. `railway up` is no longer used.
 The repository root is the Docker build context; it contains the service, the
 vendored `service-auth` dependency (`vendor/service-auth`) and the registry
 (`data/external_app_registry.ts`, canonical). The `integrations/<app>/README.md` guides are a snapshot
