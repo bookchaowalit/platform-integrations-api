@@ -2,6 +2,8 @@ google-api-python-client==2.200.0
 google-auth-httplib2==0.4.2
 google-auth-oauthlib==1.4.1
 # Transitive floors: keep resolvers off releases with known vulnerabilities
-# (protobuf PYSEC-2026-1805 / GHSA-7gcm-g887-7qv7, idna PYSEC-2026-215 / GHSA-65pc-fj4g-8rjx).
+# (protobuf PYSEC-2026-1805 / GHSA-7gcm-g887-7qv7, idna PYSEC-2026-215 / GHSA-65pc-fj4g-8rjx,
+# certifi PYSEC-2026-4320 / GHSA-6q48-6c7w-9gw2).
 protobuf>=5.29.6
 idna>=3.15
+certifi>=2026.10.19
