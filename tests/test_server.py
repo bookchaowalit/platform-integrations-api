@@ -14,6 +14,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import jwt
+import pytest
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from service_auth import AuthPolicy
@@ -21,7 +22,7 @@ from service_auth import AuthPolicy
 ROOT = Path(__file__).resolve().parents[1]
 REPO = ROOT
 sys.path.insert(0, str(ROOT))
-from server import IntegrationsApi, parse_registry
+from server import IntegrationsApi, parse_registry  # noqa: E402 - after the repo root is on sys.path
 
 REGISTRY = """export const EXTERNAL_APP_REGISTRY: ExternalAppRecord[] = [
   // Existing direct integrations (2)
@@ -93,12 +94,12 @@ class IntegrationsApiTest(unittest.TestCase):
                 + jwt.encode({**claims, **(changes or {})}, key, algorithm="RS256")
             }
 
-        self.assertEqual(api.handle("GET", "/health").status, 200)
-        self.assertEqual(api.handle("GET", "/ready").status, 200)
-        self.assertEqual(api.handle("GET", "/api/v1/integrations").status, 401)
+        assert api.handle("GET", "/health").status == 200
+        assert api.handle("GET", "/ready").status == 200
+        assert api.handle("GET", "/api/v1/integrations").status == 401
         response = api.handle("GET", "/api/v1/integrations", headers=headers())
-        self.assertEqual(response.status, 200)
-        self.assertEqual(len(response.payload["source"]["revision"]), 64)
+        assert response.status == 200
+        assert len(response.payload["source"]["revision"]) == 64
         for changes, expected in (
             ({"scope": "other:read"}, 403),
             ({"tenant_id": "other"}, 403),
@@ -112,16 +113,16 @@ class IntegrationsApiTest(unittest.TestCase):
                 denied = api.handle(
                     "GET", "/api/v1/integrations", headers=headers(changes)
                 )
-                self.assertEqual(denied.status, expected)
-                self.assertEqual(set(denied.payload), {"error"})
-                self.assertNotIn("Bearer", json.dumps(denied.payload))
-        self.assertEqual(
+                assert denied.status == expected
+                assert set(denied.payload) == {"error"}
+                assert "Bearer" not in json.dumps(denied.payload)
+        assert (
             api.handle(
                 "GET",
                 "/api/v1/integrations",
                 headers={"Authorization": "Bearer " + "x" * 9000},
-            ).status,
-            401,
+            ).status
+            == 401
         )
 
     def test_static_token_is_never_production_authorization(self) -> None:
@@ -129,25 +130,25 @@ class IntegrationsApiTest(unittest.TestCase):
             api = IntegrationsApi(
                 self.path, token="development-only", environment="production"
             )
-        self.assertEqual(
+        assert (
             api.handle(
                 "GET",
                 "/api/v1/integrations",
                 headers={"Authorization": "Bearer development-only"},
-            ).status,
-            503,
+            ).status
+            == 503
         )
-        self.assertEqual(api.handle("GET", "/health").status, 200)
-        self.assertEqual(api.handle("GET", "/ready").payload["auth"], "disabled")
+        assert api.handle("GET", "/health").status == 200
+        assert api.handle("GET", "/ready").payload["auth"] == "disabled"
 
     def test_readiness_and_remote_bind_fail_closed(self) -> None:
         with patch.dict(os.environ, {}, clear=True):
             api = IntegrationsApi(self.path, environment="development")
-        self.assertEqual(api.handle("GET", "/ready").payload["auth"], "development")
-        self.assertEqual(api.handle("GET", "/ready").status, 503)
+        assert api.handle("GET", "/ready").payload["auth"] == "development"
+        assert api.handle("GET", "/ready").status == 503
         self.path.unlink()
-        self.assertEqual(api.handle("GET", "/ready").payload["source"], "unavailable")
-        self.assertEqual(api.handle("GET", "/health").status, 200)
+        assert api.handle("GET", "/ready").payload["source"] == "unavailable"
+        assert api.handle("GET", "/health").status == 200
         env = {
             **os.environ,
             "INTEGRATIONS_API_TOKEN": "legacy-token",
@@ -163,52 +164,42 @@ class IntegrationsApiTest(unittest.TestCase):
             timeout=5,
             check=False,  # the test asserts the non-zero exit code itself
         )
-        self.assertEqual(result.returncode, 2)
-        self.assertIn("INTEGRATIONS_API_AUTH_*", result.stderr)
+        assert result.returncode == 2
+        assert "INTEGRATIONS_API_AUTH_*" in result.stderr
 
     def test_overview(self) -> None:
         payload = self.get("/api/v1/integrations").payload
-        self.assertEqual(payload["schema_version"], "solo-empire.integrations.v1")
-        self.assertEqual(payload["summary"]["apps_total"], 3)
-        self.assertEqual(payload["summary"]["connected"], 2)
-        self.assertEqual(payload["summary"]["with_guide"], 1)
+        assert payload["schema_version"] == "solo-empire.integrations.v1"
+        assert payload["summary"]["apps_total"] == 3
+        assert payload["summary"]["connected"] == 2
+        assert payload["summary"]["with_guide"] == 1
         apps = {app["id"]: app for app in payload["apps"]}
-        self.assertEqual(apps["gmail"]["guide"], "integrations/gmail/README.md")
-        self.assertEqual(apps["gmail"]["section"], "Existing direct integrations")
-        self.assertEqual(apps["supabase"]["note"], "Owner's MCP only")
-        self.assertEqual(apps["shop-x"]["section"], "Commerce")
-        self.assertEqual(
-            [item["value"] for item in payload["signals"]["statuses"]],
-            ["live", "mcp_only", "planned"],
-        )
+        assert apps["gmail"]["guide"] == "integrations/gmail/README.md"
+        assert apps["gmail"]["section"] == "Existing direct integrations"
+        assert apps["supabase"]["note"] == "Owner's MCP only"
+        assert apps["shop-x"]["section"] == "Commerce"
+        assert [item["value"] for item in payload["signals"]["statuses"]] == [
+            "live",
+            "mcp_only",
+            "planned",
+        ]
 
     def test_filters(self) -> None:
-        self.assertEqual(
-            [
-                app["id"]
-                for app in self.get("/api/v1/integrations?status=planned").payload[
-                    "apps"
-                ]
-            ],
-            ["shop-x"],
-        )
-        self.assertEqual(
-            [
-                app["id"]
-                for app in self.get("/api/v1/integrations?category=database").payload[
-                    "apps"
-                ]
-            ],
-            ["supabase"],
-        )
-        self.assertEqual(
-            [
-                app["id"]
-                for app in self.get("/api/v1/integrations?q=GMAIL").payload["apps"]
-            ],
-            ["gmail"],
-        )
-        self.assertEqual(self.get("/api/v1/integrations?q=" + "x" * 81).status, 400)
+        assert [
+            app["id"]
+            for app in self.get("/api/v1/integrations?status=planned").payload["apps"]
+        ] == ["shop-x"]
+        assert [
+            app["id"]
+            for app in self.get("/api/v1/integrations?category=database").payload[
+                "apps"
+            ]
+        ] == ["supabase"]
+        assert [
+            app["id"]
+            for app in self.get("/api/v1/integrations?q=GMAIL").payload["apps"]
+        ] == ["gmail"]
+        assert self.get("/api/v1/integrations?q=" + "x" * 81).status == 400
 
     def test_strict_parsing_fails_closed(self) -> None:
         for broken in (
@@ -219,41 +210,42 @@ class IntegrationsApiTest(unittest.TestCase):
             REGISTRY.replace("{ id: 'shop-x'", "{ id: shopX"),
             REGISTRY.replace("id: 'supabase'", "id: 'gmail'"),
         ):
-            with self.subTest(broken=broken[:0]), self.assertRaises(ValueError):
+            with (
+                self.subTest(broken=broken[:0]),
+                pytest.raises(ValueError, match="registry"),
+            ):
                 parse_registry(broken)
         self.path.write_text(
             REGISTRY.replace("{ id: 'shop-x'", "{ id: shopX"), encoding="utf-8"
         )
         response = self.get("/api/v1/integrations")
-        self.assertEqual(response.status, 503)
-        self.assertEqual(response.payload["error"]["code"], "registry_unavailable")
+        assert response.status == 503
+        assert response.payload["error"]["code"] == "registry_unavailable"
 
     def test_read_only_and_auth(self) -> None:
-        self.assertEqual(self.api.handle("POST", "/api/v1/integrations").status, 405)
-        self.assertEqual(self.get("/api/v1/other").status, 404)
+        assert self.api.handle("POST", "/api/v1/integrations").status == 405
+        assert self.get("/api/v1/other").status == 404
         guarded = IntegrationsApi(
             self.path, token="t0ken", environment="development", root=self.root
         )
-        self.assertEqual(guarded.handle("GET", "/api/v1/integrations").status, 401)
-        self.assertEqual(
+        assert guarded.handle("GET", "/api/v1/integrations").status == 401
+        assert (
             guarded.handle(
                 "GET", "/api/v1/integrations", headers={"Authorization": "Bearer t0ken"}
-            ).status,
-            200,
+            ).status
+            == 200
         )
-        self.assertEqual(
+        assert (
             IntegrationsApi(self.path, token="", environment="production")
             .handle("GET", "/api/v1/integrations")
-            .status,
-            503,
+            .status
+            == 503
         )
 
     def test_real_registry_parses_every_record(self) -> None:
         real = REPO / "data" / "external_app_registry.ts"
         records = parse_registry(real.read_text(encoding="utf-8"))
-        self.assertEqual(
-            len(records), real.read_text(encoding="utf-8").count("{ id: '")
-        )
+        assert len(records) == real.read_text(encoding="utf-8").count("{ id: '")
 
 
 if __name__ == "__main__":

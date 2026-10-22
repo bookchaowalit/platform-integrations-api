@@ -12,7 +12,7 @@ checkout is absent (CI). After editing, run `task tools-hub:write` in solo-empir
 
 Docs: `docs/OVERVIEW.md` (integration overview), `docs/INTEGRATION-GUIDE.md`, `docs/EXTERNAL-APP-REGISTRY.md`, `docs/landing-page-integration.md`; per-provider guides live in `integrations/<id>/README.md`; `integrations/google/` also holds the Calendar OAuth setup script (`setup_calendar.py`).
 
-Test: `PYTHONPATH=vendor/service-auth python3 -m unittest discover -s tests -v`
+Test: `uv sync --frozen --all-extras && uv run pytest -q` (see [Test](#test))
 
 ---
 
@@ -34,8 +34,8 @@ partial list. Keep each record on one line when editing the registry.
 From this repository root:
 
 ```bash
-python3 -m pip install ./vendor/service-auth .
-python3 server.py
+uv sync --frozen --no-dev   # installs from uv.lock, including vendor/service-auth
+uv run python server.py
 ```
 
 The default listener is `http://127.0.0.1:3480`. Configure
@@ -73,7 +73,10 @@ The image enforces scoped JWT authorization and binds `0.0.0.0`.
 ## Test
 
 ```bash
-PYTHONPATH=vendor/service-auth python3 -m unittest discover -s tests -v
+uv sync --frozen --all-extras          # dependencies from uv.lock (vendor/service-auth is a path source)
+uvx ruff@0.17.1 check . && uvx ruff@0.17.1 format --check .
+uv run mypy .                           # strict on server.py, _sentry.py, integrations_mcp.py
+uv run pytest -q --cov                  # CI gates total coverage (see .github/workflows/ci.yml)
 ```
 
 ## Scoped authorization and readiness
@@ -138,6 +141,6 @@ Trade-off: the signing key can mint tokens for every Solo Web service, so only r
 that already holds that key. A narrower alternative, if the key must not sit beside agents, is a Solo Web owner-session
 endpoint that issues a per-service token; set `EMPIRE_TOKEN` from it and the key is never read.
 
-Run: `uv venv .venv && uv pip install ./vendor/service-auth -e ".[dev]"`, then `.venv/bin/integrations-mcp` (see `.mcp.json`).
+Run: `uv sync --frozen --all-extras`, then `.venv/bin/integrations-mcp` (see `.mcp.json`).
 Tests: `.venv/bin/pytest tests/test_mcp.py` (fake HTTP transport and a throwaway key; the minted token is checked with
 the vendored `service_auth` verifier the API uses).

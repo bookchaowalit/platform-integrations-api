@@ -14,7 +14,72 @@ py-modules = ["server", "_sentry", "integrations_mcp"]
 
 [project.optional-dependencies]
 mcp = ["mcp>=2.3,<3", "httpx>=0.27,<1"]  # integrations-mcp (integrations_mcp.py); not needed by the API image
-dev = ["pytest>=8", "mcp>=2.3,<3", "httpx>=0.27,<1"]
+dev = [
+    "pytest>=8",
+    "pytest-cov>=7",
+    "mcp>=2.3,<3",
+    "httpx>=0.27,<1",
+    "mypy>=2.4",
+]
 
 [project.scripts]
 integrations-mcp = "integrations_mcp:main"
+
+# solo-empire-service-auth is vendored (a copy of bookchaowalit/platform-auth-sdk, not on PyPI);
+# uv.lock records it as this local path, so CI and the image install the same copy.
+[tool.uv.sources]
+solo-empire-service-auth = { path = "vendor/service-auth" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.coverage.run]
+source = ["server", "_sentry", "integrations_mcp"]
+
+[tool.ruff]
+target-version = "py311"
+# vendor/service-auth is a verbatim copy of bookchaowalit/platform-auth-sdk; lint it there.
+extend-exclude = ["vendor"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W", "F", "I", "B", "BLE", "UP", "C4", "SIM", "RUF", "PIE", "PT", "RET", "ISC",
+    "PERF", "LOG", "G", "FURB",
+]
+# ruff format wraps code at 88; what stays longer are nosemgrep/noqa justifications, which
+# must sit on the flagged line.
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["server.py", "_sentry.py", "integrations_mcp.py", "tests"]
+# CI runs `mypy .`. Not checked here: the vendored copy (and its in-tree build), maintained in
+# platform-auth-sdk, and integrations/google/setup_calendar.py, a one-off owner script with its own
+# requirements.txt that imports a module outside this repo.
+exclude = ["^vendor/", "(^|/)build/", "^integrations/"]
+# The vendored service_auth source is read from here (the installed copy has no py.typed).
+mypy_path = "vendor/service-auth"
+strict_equality = true
+warn_redundant_casts = true
+warn_unused_configs = true
+warn_unused_ignores = true
+
+# Service code: mypy --strict (the global-only strict flags are set above). tests/ stays gradual:
+# its fixtures and test functions are unannotated, so mypy checks only their call sites.
+[[tool.mypy.overrides]]
+module = ["server", "_sentry", "integrations_mcp"]
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_subclassing_any = true
+disallow_untyped_calls = true
+disallow_untyped_decorators = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+no_implicit_reexport = true
+warn_return_any = true
+
+# Vendored copy of platform-auth-sdk: type-checked where it is maintained, not here.
+[[tool.mypy.overrides]]
+module = ["service_auth"]
+follow_imports = "silent"

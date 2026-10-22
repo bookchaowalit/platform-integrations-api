@@ -78,11 +78,10 @@ def setup_credentials():
     if CREDENTIALS_FILE.exists():
         print(f"   ✅ Found: {CREDENTIALS_FILE}")
         return True
-    else:
-        print(f"   ⏳ Waiting for: {CREDENTIALS_FILE}")
-        print("\n💡 Tip: You can manually copy the file to:")
-        print(f"   {CREDENTIALS_FILE}")
-        return False
+    print(f"   ⏳ Waiting for: {CREDENTIALS_FILE}")
+    print("\n💡 Tip: You can manually copy the file to:")
+    print(f"   {CREDENTIALS_FILE}")
+    return False
 
 
 def test_connection():
@@ -108,9 +107,8 @@ def test_connection():
         if count > 0:
             print(f"\n✅ Successfully synced {count} events!")
             return True
-        else:
-            print("\n⚠️  No events found (this is OK if your calendar is empty)")
-            return True
+        print("\n⚠️  No events found (this is OK if your calendar is empty)")
+        return True
 
     except Exception as e:  # noqa: BLE001 - interactive setup: report any failure and return False
         print(f"❌ Connection test failed: {e}")
