@@ -35,7 +35,7 @@ Sources: `server.py`, `vendor/service-auth/service_auth/__init__.py`, `integrati
 
 | Element | Threat | Existing mitigation (code) | Gap |
 |---|---|---|---|
-| HTTP handler | **S** forged caller | RS256 only, local public key, rejects remote key headers, `iss/aud/sub/tenant/scope`, ≤120 s + `jti` required (`service_auth`) | `jti` only format-checked (`service_auth` lines ~157-161), no replay store; token reusable within its ≤120 s life |
+| HTTP handler | **S** forged caller | RS256 only, local public key, rejects remote key headers, checks claims `iss`, `aud`, `sub`, `tenant` and `scope`, ≤120 s + `jti` required (`service_auth`) | `jti` only format-checked (`service_auth` lines ~157-161), no replay store, so a captured JWT can be replayed until it expires (at most 120 s) |
 | HTTP handler | **T** tamper query | length limits 40/80 → 400 (`query_value`) | — |
 | HTTP handler | **R** no audit of reads | — | `log_message` returns nothing: ไม่มี access log เลย |
 | HTTP handler | **I** error leaks | fixed error messages; 500 never echoes text; `Cache-Control: no-store`, `nosniff` | — |
