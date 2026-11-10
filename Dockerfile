@@ -15,6 +15,13 @@ COPY data/external_app_registry.ts /app/data/external_app_registry.ts
 COPY integrations /app/integrations
 
 RUN useradd --system --uid 10001 app
+# Image hardening: take Debian security fixes newer than the base tag, then drop the base
+# image's pip (the app runs from its installed environment; pip's vendored urllib3/msgpack/
+# setuptools copies are what the Trivy image scan flags).
+RUN apt-get update \
+    && apt-get upgrade -y --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/* \
+    && /usr/local/bin/python3 -m pip uninstall -y --disable-pip-version-check pip
 USER app
 EXPOSE 3480
 HEALTHCHECK --interval=15s --timeout=3s --retries=3 CMD python -c "import os, urllib.request; port=os.environ.get('INTEGRATIONS_API_PORT', os.environ.get('PORT', '3480')); urllib.request.urlopen('http://127.0.0.1:'+port+'/ready', timeout=2)"
