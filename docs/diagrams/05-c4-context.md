@@ -23,7 +23,7 @@ C4Context
   Rel(hub, github, "Reads data/external_app_registry.ts from sibling checkout")
 ```
 
-Sources: `PRODUCT.md`, `README.md`, `server.py`, `_sentry.py`, `integrations_mcp.py`, `.railway/railway.ts`, `railway.toml`; life-dashboard-web @ `17159a9` `lib/backends.ts`; platform-uptime-worker @ `57f0afb` `src/targets.ts` (`integrations-api`, `SLEEPS`)
+Sources: `PRODUCT.md`, `README.md`, `server.py`, `_sentry.py`, `integrations_mcp.py`, `.railway/railway.ts`, `.railway/railway.ts`; life-dashboard-web @ `17159a9` `lib/backends.ts`; platform-uptime-worker @ `57f0afb` `src/targets.ts` (`integrations-api`, `SLEEPS`)
 
 หมายเหตุ: API **ไม่** เรียก provider ภายนอกใด ๆ (Google, GitHub ฯลฯ) — ลิงก์ `apiDocs` เป็นแค่ข้อความ; ตัวเดียวที่มีการเรียก Google คือ `integrations/google/setup_calendar.py` ซึ่งเป็น owner script local ไม่ได้อยู่ใน image
 

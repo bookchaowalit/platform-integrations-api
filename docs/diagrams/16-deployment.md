@@ -19,7 +19,7 @@ flowchart LR
   LOCAL["Owner machine: .venv/bin/integrations-mcp"] --> DOM
 ```
 
-Sources: `.railway/railway.ts`, `railway.toml`, `Dockerfile`, `PRODUCT.md` (Operating Context: URL, Singapore, serverless), `README.md`, Railway `railway variables --json` key names and `railway deployment list` (2026-11-04), platform-uptime-worker @ `57f0afb` `src/targets.ts`, platform-api-gateway @ `1f02c2a` `routes.json`, life-dashboard-web @ `17159a9` `lib/backends.ts`
+Sources: `.railway/railway.ts`, `.railway/railway.ts`, `Dockerfile`, `PRODUCT.md` (Operating Context: URL, Singapore, serverless), `README.md`, Railway `railway variables --json` key names and `railway deployment list` (2026-11-04), platform-uptime-worker @ `57f0afb` `src/targets.ts`, platform-api-gateway @ `1f02c2a` `routes.json`, life-dashboard-web @ `17159a9` `lib/backends.ts`
 
 | Item | Value |
 |---|---|

@@ -30,7 +30,7 @@ flowchart LR
   ED --> U6
 ```
 
-Sources: `server.py` (`handle`, `_overview`, `_check_read_auth`), `vendor/service-auth/service_auth/__init__.py`, `integrations_mcp.py` (`integrations.list`, `mint`), `railway.toml` (`healthcheckPath = "/ready"`), `PRODUCT.md` (Users), platform-uptime-worker `src/targets.ts` @ `57f0afb` (`integrations-api` → `/health`)
+Sources: `server.py` (`handle`, `_overview`, `_check_read_auth`), `vendor/service-auth/service_auth/__init__.py`, `integrations_mcp.py` (`integrations.list`, `mint`), `.railway/railway.ts` (`healthcheckPath = "/ready"`), `PRODUCT.md` (Users), platform-uptime-worker `src/targets.ts` @ `57f0afb` (`integrations-api` → `/health`)
 
 | Use case | Actor | Auth | Result |
 |---|---|---|---|

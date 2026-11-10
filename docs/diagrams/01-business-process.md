@@ -19,7 +19,7 @@ flowchart TD
   E --> HUB["solo-empire Tools Hub / building-block guard read the file from sibling checkout"]
 ```
 
-Sources: `README.md`, `PRODUCT.md`, `server.py`, `Dockerfile`, `railway.toml`, `.railway/railway.ts`, `.github/workflows/ci.yml`, `integrations_mcp.py`
+Sources: `README.md`, `PRODUCT.md`, `server.py`, `Dockerfile`, `.railway/railway.ts`, `.railway/railway.ts`, `.github/workflows/ci.yml`, `integrations_mcp.py`
 
 ขั้นตอนธุรกิจหลักคือ "ดูว่าระบบเชื่อมกับแอปไหนแล้ว / แค่วางแผนไว้" — status มี 4 ค่า (`live`, `mcp_only`, `paused`, `planned`) ตาม `STATUS_DEFINITIONS` ใน `server.py`; การ promote `planned` ต้องมี credential folder, data contract, rate-limit, redaction, idempotent sync และ test ก่อน (`docs/EXTERNAL-APP-REGISTRY.md`) — แต่ขั้นนี้ทำนอก repo นี้
 

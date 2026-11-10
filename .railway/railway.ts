@@ -1,26 +1,23 @@
-import { defineRailway, project, service } from "railway/iac";
-
-// platform-integrations-api: read-only metadata API for solo-web. Variables stay unmanaged (secrets live in Railway only).
-// The service sleeps when idle (Railway Serverless). Build and healthcheck come from railway.toml.
-// Needs the SDK to run: npm install railway (kept out of this Python repo; run it from a scratch directory).
-// Region is not in the IaC; after the first deploy: railway scale --service solo-integrations asia-southeast1-eqsg3a=1 us-east4-eqdc4a=0
-// Every service deploys from GitHub main after CI passes (Railway Wait for CI, 2026-10-18).
-// Declared here so `railway config apply` keeps the connection instead of removing it.
-const github = {
-  type: "github" as const,
-  repo: "bookchaowalit/platform-integrations-api",
-  branch: "main",
-  checkSuites: true,
-};
-
+import { defineRailway, github, project, service } from "railway/iac";
+// Railway IaC. Replaces railway.toml / railway.json, which Railway stops reading on 2026-12-01.
+// Build, healthcheck, start command, cron and restart policy live on the service; deploys do not read this file.
+// Check drift: npm install railway in a scratch parent directory (not this repo), railway link, railway config plan.
+// This repository manages only its own resources in the environment. Other
+// repositories export their own partial name.
+// See https://docs.railway.com/infrastructure-as-code#multi-repo-projects
+export const partial = "solo-integrations";
 export default defineRailway(() => {
-  const api = service("solo-integrations", {
-    source: github,
-    deploy: { sleepApplication: true },
+  const soloIntegrations = service("solo-integrations", {
+    source: github("bookchaowalit/platform-integrations-api", { branch: "main", checkSuites: true }),
+    build: { buildEnvironment: "V3", builder: "DOCKERFILE", dockerfilePath: "Dockerfile" },
+    healthcheck: "/ready",
+    healthcheckTimeout: 30,
+    replicas: { "asia-southeast1-eqsg3a": 1 },
+    deploy: { sleepApplication: true, restartPolicyMaxRetries: 3 },
   });
 
   return project("platform-integrations-api", {
     variables: { managed: false },
-    resources: [api],
+    resources: [soloIntegrations],
   });
 });

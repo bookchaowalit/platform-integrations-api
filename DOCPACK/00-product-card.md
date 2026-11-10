@@ -34,7 +34,7 @@ owner: Product owner (Book Dev)
 | ซอร์สโค้ด | 5 ไฟล์ / 902 บรรทัด |
 | เทสต์ | 2 ไฟล์ (ไม่ได้รันในงานนี้) |
 | CI | ไม่มี workflow |
-| Deploy config | `railway.toml` + `Dockerfile` (ทะเบียนระบุ staged คือยังไม่ deploy) |
+| Deploy config | `.railway/railway.ts` + `Dockerfile` (ทะเบียนระบุ staged คือยังไม่ deploy) |
 | Live URL | ไม่มี |
 
 ## 5. คุณค่าและจุดต่าง

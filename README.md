@@ -81,7 +81,7 @@ uv run pytest -q --cov                  # CI gates total coverage (see .github/w
 
 ## Scoped authorization and readiness
 
-[Railway configuration](railway.toml) selects the Dockerfile and `/ready`
+[Railway configuration](.railway/railway.ts) selects the Dockerfile and `/ready`
 health check (30 seconds), with at most 3 restarts after failure. It declares
 no region, resources, runtime secret values, or existing cloud deployment.
 

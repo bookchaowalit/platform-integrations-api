@@ -69,4 +69,4 @@ sequenceDiagram
   A-->>RW: JSON
 ```
 
-Sources: `railway.toml`, `server.py` `_ready`, `vendor/service-auth/service_auth/__init__.py` `readiness`
+Sources: `.railway/railway.ts`, `server.py` `_ready`, `vendor/service-auth/service_auth/__init__.py` `readiness`

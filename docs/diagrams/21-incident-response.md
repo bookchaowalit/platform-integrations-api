@@ -26,7 +26,7 @@ flowchart TD
   V --> PM["Postmortem: not defined in repo"]
 ```
 
-Sources: platform-uptime-worker @ `57f0afb` `src/monitor.ts`, `src/worker.ts`; `_sentry.py`; `server.py` error codes; `vendor/service-auth/service_auth/__init__.py` `readiness`; `railway.toml`; `README.md` (rollback, key rotation)
+Sources: platform-uptime-worker @ `57f0afb` `src/monitor.ts`, `src/worker.ts`; `_sentry.py`; `server.py` error codes; `vendor/service-auth/service_auth/__init__.py` `readiness`; `.railway/railway.ts`; `README.md` (rollback, key rotation)
 
 ## Open questions
 

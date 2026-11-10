@@ -22,4 +22,4 @@ C4Container
   Rel(api, sentry, "capture(exc)")
 ```
 
-Sources: `Dockerfile`, `railway.toml`, `.railway/railway.ts`, `server.py`, `integrations_mcp.py`, `.mcp.json`, `pyproject.toml`, `_sentry.py`, `service.yaml` (`data.reads`, `writes: []`)
+Sources: `Dockerfile`, `.railway/railway.ts`, `.railway/railway.ts`, `server.py`, `integrations_mcp.py`, `.mcp.json`, `pyproject.toml`, `_sentry.py`, `service.yaml` (`data.reads`, `writes: []`)

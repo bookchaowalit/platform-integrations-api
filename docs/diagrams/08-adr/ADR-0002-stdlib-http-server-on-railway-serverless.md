@@ -11,7 +11,7 @@ API เล็ก read-only, traffic ต่ำ (owner คนเดียว)
 
 ## Evidence
 - `server.py` imports; `pyproject.toml` `dependencies`
-- `Dockerfile`, `railway.toml` (`builder = "DOCKERFILE"`, `healthcheckPath = "/ready"`)
+- `Dockerfile`, `.railway/railway.ts` (`builder = "DOCKERFILE"`, `healthcheckPath = "/ready"`)
 - `.railway/railway.ts` (`sleepApplication: true`, `checkSuites: true`, branch `main`)
 - `README.md` Deploy section
 

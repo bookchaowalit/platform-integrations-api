@@ -16,7 +16,7 @@ flowchart LR
   DH["Docker HEALTHCHECK every 15 s"] --> R
 ```
 
-Sources: `server.py` (`log_message` returns nothing, `print(... running on ...)`, `capture`), `_sentry.py`, `railway.toml`, `Dockerfile` (`HEALTHCHECK`), `PRODUCT.md` (Operating Context, Measures); platform-uptime-worker @ `57f0afb` `src/targets.ts` (`integrations-api`, `SLEEPS`), `src/monitor.ts` (`FAILURES_BEFORE_DOWN = 2`, `REMINDER_HOURS = 6`), `src/worker.ts` (Telegram), `wrangler.toml` (crons)
+Sources: `server.py` (`log_message` returns nothing, `print(... running on ...)`, `capture`), `_sentry.py`, `.railway/railway.ts`, `Dockerfile` (`HEALTHCHECK`), `PRODUCT.md` (Operating Context, Measures); platform-uptime-worker @ `57f0afb` `src/targets.ts` (`integrations-api`, `SLEEPS`), `src/monitor.ts` (`FAILURES_BEFORE_DOWN = 2`, `REMINDER_HOURS = 6`), `src/worker.ts` (Telegram), `wrangler.toml` (crons)
 
 | Signal | Watched by | Covered | Not covered |
 |---|---|---|---|

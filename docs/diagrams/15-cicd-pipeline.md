@@ -27,7 +27,7 @@ flowchart TD
   RW --> HC["Healthcheck GET /ready, 30 s, restart ON_FAILURE max 3"]
 ```
 
-Sources: `.github/workflows/ci.yml`, platform-ci-workflows @ `87dc5e1c` `.github/workflows/ci-python.yml` (steps Checkout, Set up uv and Python, Install dependencies, Lint (Ruff), Typecheck, Test, Coverage gate; Postgres steps not used here) and `security.yml` (jobs `gitleaks`, `semgrep`, `osv-scanner`, `trivy-fs`), `.railway/railway.ts` (`checkSuites: true`), `railway.toml`, `renovate.json`
+Sources: `.github/workflows/ci.yml`, platform-ci-workflows @ `87dc5e1c` `.github/workflows/ci-python.yml` (steps Checkout, Set up uv and Python, Install dependencies, Lint (Ruff), Typecheck, Test, Coverage gate; Postgres steps not used here) and `security.yml` (jobs `gitleaks`, `semgrep`, `osv-scanner`, `trivy-fs`), `.railway/railway.ts` (`checkSuites: true`), `.railway/railway.ts`, `renovate.json`
 
 อื่น ๆ: concurrency `ci-${{ github.ref }}` cancel-in-progress; `permissions: contents: read`; Renovate จันทร์ก่อน 9 โมง (Asia/Bangkok), group `platform-ci-workflows`
 

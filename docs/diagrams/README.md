@@ -12,7 +12,7 @@ repo นี้คือ **read-only Integrations API**: Python stdlib HTTP serve
 | 03 | User flows | done | [03-user-flows.md](03-user-flows.md) | `server.py`, `integrations_mcp.py`, life-dashboard-web `lib/backends.ts`, `modules/integrations/client.tsx` |
 | 04 | Traceability (RTM) | done | [04-traceability.md](04-traceability.md) | `PRODUCT.md`, SPEC-001, `tests/*.py`, `ci.yml` |
 | 05 | C4 Context | done | [05-c4-context.md](05-c4-context.md) | `PRODUCT.md`, `.railway/railway.ts`, consumer repos |
-| 06 | C4 Container | done | [06-c4-container.md](06-c4-container.md) | `Dockerfile`, `railway.toml`, `service.yaml`, `.mcp.json` |
+| 06 | C4 Container | done | [06-c4-container.md](06-c4-container.md) | `Dockerfile`, `.railway/railway.ts`, `service.yaml`, `.mcp.json` |
 | 07 | C4 Component | done | [07-c4-component.md](07-c4-component.md) | `server.py`, `integrations_mcp.py`, `_sentry.py` |
 | 08 | ADRs | done (5) | [08-adr/](08-adr/) | `service.yaml`, `Dockerfile`, `.railway/railway.ts`, `service_auth`, `integrations_mcp.py`, `_sentry.py` |
 | 09 | ERD | done (file + in-memory model; no DB) | [09-erd.md](09-erd.md) | `data/external_app_registry.ts`, `server.py`, contract |
@@ -22,7 +22,7 @@ repo นี้คือ **read-only Integrations API**: Python stdlib HTTP serve
 | 13 | Threat model | done | [13-threat-model.md](13-threat-model.md) | `server.py`, `service_auth`, `integrations_mcp.py`, `_sentry.py`, `Dockerfile` |
 | 14 | Backup & DR | done (no data store; RTO/RPO not defined) | [14-backup-dr.md](14-backup-dr.md) | `service.yaml`, `README.md`, Railway variable names |
 | 15 | CI/CD pipeline | done | [15-cicd-pipeline.md](15-cicd-pipeline.md) | `ci.yml`, platform-ci-workflows @ `87dc5e1c`, `.railway/railway.ts`, `gh run list` |
-| 16 | Deployment | done | [16-deployment.md](16-deployment.md) | `railway.toml`, `Dockerfile`, `PRODUCT.md`, Railway CLI, live probe |
+| 16 | Deployment | done | [16-deployment.md](16-deployment.md) | `.railway/railway.ts`, `Dockerfile`, `PRODUCT.md`, Railway CLI, live probe |
 | 17 | Test coverage matrix | done | [17-test-coverage-matrix.md](17-test-coverage-matrix.md) | `tests/*.py`, `pyproject.toml`, `ci.yml` |
 | 18 | Git & release workflow | done | [18-git-release-workflow.md](18-git-release-workflow.md) | `git log`, `gh pr list`, `ci.yml`, SPEC-001 |
 | 19 | Service dependency map | done | [19-service-dependency-map.md](19-service-dependency-map.md) | `Dockerfile`, `pyproject.toml`, consumer repos |
