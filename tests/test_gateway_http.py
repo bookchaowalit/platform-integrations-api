@@ -187,3 +187,24 @@ def test_a_stalled_body_cannot_hold_the_handler():
         if isinstance(v, type) and hasattr(v, "gateway") and hasattr(v, "_body")
     )
     assert 0 < handler.timeout <= 60
+
+
+def test_extra_open_prefix_keeps_matching_its_own_paths():
+    for path in ("/api/public/", "/api/public/v1/hook", "/api/public/v1/hook/"):
+        assert (
+            gateway_http.result_for(
+                check("enforce"), "POST", path, headers(), no_body, ("/api/public/",)
+            )
+            is None
+        )
+    assert (
+        gateway_http.result_for(
+            check("enforce"),
+            "POST",
+            "/api/publicx",
+            headers(),
+            no_body,
+            ("/api/public/",),
+        )
+        == "missing"
+    )
