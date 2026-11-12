@@ -35,6 +35,8 @@ from urllib.parse import parse_qs, urlsplit
 
 from service_auth import AuthError, AuthPolicy, check_read_auth, is_loopback, readiness
 
+import gateway
+import gateway_http
 from _sentry import capture, init_sentry
 
 init_sentry()
@@ -378,11 +380,21 @@ class IntegrationsApi:
 
 class IntegrationsRequestHandler(BaseHTTPRequestHandler):
     api = IntegrationsApi()
+    # SPEC-002 (platform-api-gateway): set in main() from GATEWAY_ASSERTION_*; None = off.
+    gateway: gateway.GatewayCheck | None = None
+
+    def _body(self) -> bytes:
+        length = int(self.headers.get("Content-Length") or 0)
+        return self.rfile.read(length) if length else b""
 
     def log_message(self, format: str, *args: Any) -> None:
         return
 
     def _dispatch(self) -> None:
+        result = gateway_http.result_for(self.gateway, self.command, self.path, self.headers, self._body)
+        if gateway_http.refused(self.gateway, self.path, result):
+            self._write(Response(403, {"error": "gateway_required"}), origin=None)
+            return
         origin = self.headers.get("Origin")
         if origin and origin not in self.api.allowed_origins:
             self._write(
@@ -466,6 +478,7 @@ def main() -> None:
             parser.error(
                 "a non-loopback --host requires valid INTEGRATIONS_API_AUTH_* configuration"
             )
+    IntegrationsRequestHandler.gateway = gateway.GatewayCheck.from_env("integrations")
     server = ThreadingHTTPServer((args.host, args.port), IntegrationsRequestHandler)
     print(f"{SERVICE_NAME} running on http://{args.host}:{args.port}", flush=True)
     try:

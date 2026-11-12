@@ -9,7 +9,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 INTEGRATIONS_API_HOST=0.0.0.0 I
     UV_PROJECT_ENVIRONMENT=/opt/venv PATH=/opt/venv/bin:$PATH
 WORKDIR /app
 COPY vendor/service-auth /app/vendor/service-auth
-COPY pyproject.toml uv.lock server.py _sentry.py /app/
+COPY pyproject.toml uv.lock server.py _sentry.py gateway.py gateway_http.py /app/
 RUN uv sync --frozen --no-dev --no-editable --no-cache --python /usr/local/bin/python3
 COPY data/external_app_registry.ts /app/data/external_app_registry.ts
 COPY integrations /app/integrations
