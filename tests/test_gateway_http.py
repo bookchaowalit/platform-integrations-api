@@ -176,3 +176,14 @@ def test_extra_open_paths_and_duplicate_authorization():
         gateway_http.result_for(check("enforce"), "GET", target, twice, no_body)
         == "invalid"
     )
+
+
+def test_a_stalled_body_cannot_hold_the_handler():
+    import server
+
+    handler = next(
+        v
+        for v in vars(server).values()
+        if isinstance(v, type) and hasattr(v, "gateway") and hasattr(v, "_body")
+    )
+    assert 0 < handler.timeout <= 60
