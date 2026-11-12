@@ -149,3 +149,30 @@ def test_main_installs_the_check_with_the_route_key(monkeypatch):
 
     source = Path(server.__file__).read_text()
     assert 'GatewayCheck.from_env("integrations")' in source
+
+
+def test_extra_open_paths_and_duplicate_authorization():
+    assert (
+        gateway_http.result_for(
+            check("enforce"), "GET", "/ready", headers(), no_body, ("/ready",)
+        )
+        is None
+    )
+    hook = "/api/public/v1/hook"
+    assert (
+        gateway_http.result_for(
+            check("enforce"), "POST", hook, headers(), no_body, ("/api/public/",)
+        )
+        is None
+    )
+    assert (
+        gateway_http.result_for(check("enforce"), "GET", "/ready", headers(), no_body)
+        == "missing"
+    )
+    target = "/api/v1/things"
+    twice = headers(X_Gateway_Assertion=signed("GET", target), Authorization="Bearer t")
+    twice["Authorization"] = "Bearer other"
+    assert (
+        gateway_http.result_for(check("enforce"), "GET", target, twice, no_body)
+        == "invalid"
+    )
