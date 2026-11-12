@@ -391,7 +391,9 @@ class IntegrationsRequestHandler(BaseHTTPRequestHandler):
         return
 
     def _dispatch(self) -> None:
-        result = gateway_http.result_for(self.gateway, self.command, self.path, self.headers, self._body)
+        result = gateway_http.result_for(
+            self.gateway, self.command, self.path, self.headers, self._body
+        )
         if gateway_http.refused(self.gateway, self.path, result):
             self._write(Response(403, {"error": "gateway_required"}), origin=None)
             return

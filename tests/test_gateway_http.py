@@ -27,8 +27,12 @@ def headers(**values: str) -> email.message.Message:
     return m
 
 
-def signed(method: str, target: str, auth: str = "Bearer t", body: bytes = b"", ctype: str = "") -> str:
-    return gateway.expected(KEY, SYSTEM, method, target, int(time.time()), "req-1", auth, ctype, body)
+def signed(
+    method: str, target: str, auth: str = "Bearer t", body: bytes = b"", ctype: str = ""
+) -> str:
+    return gateway.expected(
+        KEY, SYSTEM, method, target, int(time.time()), "req-1", auth, ctype, body
+    )
 
 
 def check(mode: str = "report") -> gateway.GatewayCheck:
@@ -42,7 +46,10 @@ def no_body() -> bytes:
 def test_off_and_open_paths_are_not_checked():
     assert gateway_http.result_for(None, "GET", "/api/v1/x", headers(), no_body) is None
     for path in ("/health", "/readyz", "/openapi.json", "/.well-known/jwks.json"):
-        assert gateway_http.result_for(check("enforce"), "GET", path, headers(), no_body) is None
+        assert (
+            gateway_http.result_for(check("enforce"), "GET", path, headers(), no_body)
+            is None
+        )
         assert not gateway_http.refused(check("enforce"), path, None)
 
 
@@ -51,7 +58,12 @@ def test_report_logs_and_serves(caplog):
     target = "/api/v1/things?q=1"
     good = headers(X_Gateway_Assertion=signed("GET", target), Authorization="Bearer t")
     assert gateway_http.result_for(check(), "GET", target, good, lambda: b"") == "valid"
-    assert gateway_http.result_for(check(), "GET", target, headers(Authorization="Bearer t"), no_body) == "missing"
+    assert (
+        gateway_http.result_for(
+            check(), "GET", target, headers(Authorization="Bearer t"), no_body
+        )
+        == "missing"
+    )
     assert not gateway_http.refused(check(), target, "missing")
     lines = [r.getMessage() for r in caplog.records]
     assert "gateway_assertion result=valid method=GET path=/api/v1" in lines
@@ -61,26 +73,47 @@ def test_report_logs_and_serves(caplog):
 def test_enforce_refuses_missing_invalid_and_tampered():
     target = "/api/v1/things"
     assert gateway_http.refused(check("enforce"), target, "missing")
-    tampered = headers(X_Gateway_Assertion=signed("GET", target), Authorization="Bearer other")
-    result = gateway_http.result_for(check("enforce"), "GET", target, tampered, lambda: b"")
+    tampered = headers(
+        X_Gateway_Assertion=signed("GET", target), Authorization="Bearer other"
+    )
+    result = gateway_http.result_for(
+        check("enforce"), "GET", target, tampered, lambda: b""
+    )
     assert result == "invalid"
     assert gateway_http.refused(check("enforce"), target, result)
     good = headers(X_Gateway_Assertion=signed("GET", target), Authorization="Bearer t")
-    assert not gateway_http.refused(check("enforce"), target, gateway_http.result_for(check("enforce"), "GET", target, good, lambda: b""))
+    assert not gateway_http.refused(
+        check("enforce"),
+        target,
+        gateway_http.result_for(check("enforce"), "GET", target, good, lambda: b""),
+    )
 
 
 def test_body_is_signed_and_a_big_or_chunked_body_is_never_read():
     body = b'{"a":1}'
     target = "/api/v1/things"
-    good = headers(X_Gateway_Assertion=signed("POST", target, body=body, ctype="application/json"),
-                   Authorization="Bearer t", Content_Type="application/json", Content_Length=str(len(body)))
-    assert gateway_http.result_for(check(), "POST", target, good, lambda: body) == "valid"
-    assert gateway_http.result_for(check(), "POST", target, good, lambda: b'{"a":2}') == "invalid"
+    good = headers(
+        X_Gateway_Assertion=signed("POST", target, body=body, ctype="application/json"),
+        Authorization="Bearer t",
+        Content_Type="application/json",
+        Content_Length=str(len(body)),
+    )
+    assert (
+        gateway_http.result_for(check(), "POST", target, good, lambda: body) == "valid"
+    )
+    assert (
+        gateway_http.result_for(check(), "POST", target, good, lambda: b'{"a":2}')
+        == "invalid"
+    )
     forged = signed("POST", target)
-    big = headers(X_Gateway_Assertion=forged, Content_Length=str(gateway.MAX_BODY_BYTES + 1))
+    big = headers(
+        X_Gateway_Assertion=forged, Content_Length=str(gateway.MAX_BODY_BYTES + 1)
+    )
     chunked = headers(X_Gateway_Assertion=forged, Transfer_Encoding="chunked")
     assert gateway_http.result_for(check(), "POST", target, big, no_body) == "invalid"
-    assert gateway_http.result_for(check(), "POST", target, chunked, no_body) == "invalid"
+    assert (
+        gateway_http.result_for(check(), "POST", target, chunked, no_body) == "invalid"
+    )
 
 
 def test_the_handler_refuses_a_direct_call_in_enforce_and_keeps_health_open():
@@ -91,7 +124,9 @@ def test_the_handler_refuses_a_direct_call_in_enforce_and_keeps_health_open():
 
     import server
 
-    handler = type("Handler", (server.IntegrationsRequestHandler,), {"gateway": check("enforce")})
+    handler = type(
+        "Handler", (server.IntegrationsRequestHandler,), {"gateway": check("enforce")}
+    )
     httpd = ThreadingHTTPServer(("127.0.0.1", 0), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     base = f"http://127.0.0.1:{httpd.server_port}"
