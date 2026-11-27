@@ -2,6 +2,8 @@
 
 repo นี้คือ **read-only projection** ของทะเบียนแอปภายนอก (`data/external_app_registry.ts`) เป็น JSON ให้หน้า `/integrations` ของ Solo Web และให้ agent ผ่าน MCP (`integrations.list`) — ไม่เก็บ credential, ไม่เรียก provider, ไม่มี database
 
+Last reviewed: 2026-11-27 · commit `1718300`
+
 ## As-Is (จากโค้ดวันนี้)
 
 ```mermaid
@@ -19,19 +21,25 @@ flowchart TD
   E --> HUB["solo-empire Tools Hub / building-block guard read the file from sibling checkout"]
 ```
 
-Sources: `README.md`, `PRODUCT.md`, `server.py`, `Dockerfile`, `.railway/railway.ts`, `.railway/railway.ts`, `.github/workflows/ci.yml`, `integrations_mcp.py`
+Sources: `README.md`, `PRODUCT.md`, `server.py`, `Dockerfile`, `.railway/railway.ts`, `.github/workflows/ci.yml`, `integrations_mcp.py`
 
 ขั้นตอนธุรกิจหลักคือ "ดูว่าระบบเชื่อมกับแอปไหนแล้ว / แค่วางแผนไว้" — status มี 4 ค่า (`live`, `mcp_only`, `paused`, `planned`) ตาม `STATUS_DEFINITIONS` ใน `server.py`; การ promote `planned` ต้องมี credential folder, data contract, rate-limit, redaction, idempotent sync และ test ก่อน (`docs/EXTERNAL-APP-REGISTRY.md`) — แต่ขั้นนี้ทำนอก repo นี้
 
-## To-Be (จากเอกสารใน repo เท่านั้น)
+## To-Be
 
-- `specs/001-l2-baseline/spec.md` (SPEC-001) เป็นงาน tooling/test ที่ implement แล้ว ไม่เพิ่ม endpoint; review 2026-10-24 ขอแก้ตาราง §4
-- PR #1 (open, `feat: expose platform channels and owner connection observations`) เป็น To-Be ที่ยังไม่ merge — ยังไม่มีใน spec/PRODUCT.md
-- `DOCPACK/00-product-card.md` §8: "ตัดสินใจ deploy หรือคงเป็นไฟล์ทะเบียน" (ล้าสมัยแล้ว: deploy แล้ว) และ "เพิ่ม CI" (ทำแล้ว)
+ไม่มี To-Be ที่เขียนไว้ (ไม่มี `docs/UPGRADE-PLAN.md`; `specs/001-l2-baseline` เป็นงาน tooling/test ที่ implement แล้ว status in review, owner approval pending)
 
-ไม่มี `docs/UPGRADE-PLAN.md`; To-Be ระดับ process จึงเป็น open question
+PR #1 (`feat: expose platform channels and owner connection observations`) ถูกปิดโดยไม่ merge เมื่อ 2026-11-04 (ตรวจจาก GitHub) จึงไม่นับเป็น To-Be
+
+## Gap
+
+| ID | As-Is → To-Be | Status | Owner | Evidence |
+|---|---|---|---|---|
+| G1 | ไม่มี To-Be ระดับ process → To-Be ที่ owner เขียนไว้ (เช่น API ยังเป็น registry-only หรือเพิ่ม owner connection observations) | decide | owner | PR #1 closed 2026-11-04 (unmerged); `PRODUCT.md` |
+| G2 | Measures ไม่มี target ของสัดส่วน `live`/`mcp_only` และ guide coverage → กำหนด target | decide | owner | `PRODUCT.md` Measures ([ต้องยืนยัน]) |
+| G3 | `DOCPACK/00-product-card.md` §8 ยังเขียน "ตัดสินใจ deploy" และ "เพิ่ม CI" ทั้งที่ deploy และมี CI แล้ว → แก้ product card | todo | claude | `.github/workflows/ci.yml`; `PRODUCT.md` Operating Context |
+| G4 | SPEC-001 status in review → owner approval | decide | owner | `specs/001-l2-baseline/spec.md` |
 
 ## Open questions
 
-- PR #1 จะ merge หรือปิด? ถ้า merge จะเปลี่ยน API จาก registry-only เป็นมี "owner connection observations"
-- PRODUCT.md "Measures" ยังไม่มี target ของสัดส่วน `live`/`mcp_only` และ guide coverage (`[ต้องยืนยัน]`)
+- ถ้าจะเพิ่ม owner connection observations ให้ API ต้องเปลี่ยนจาก registry-only เป็นอะไร (ผูกกับ G1)
